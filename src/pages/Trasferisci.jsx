@@ -5,7 +5,7 @@ import { useToast } from '@/components/ui/Toast';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
-import { RiSearchLine, RiTransferLine, RiCheckLine } from 'react-icons/ri';
+import { RiSearchLine, RiExchangeLine, RiCheckLine } from 'react-icons/ri';
 
 function PrevenditaCard({ p, selected, onSelect }) {
   return (
@@ -151,7 +151,7 @@ export default function Trasferisci() {
       {selected && (
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="flex items-center gap-2 mb-1">
-            <RiTransferLine className="text-brand" size={18} />
+            <RiExchangeLine className="text-brand" size={18} />
             <span className="font-semibold text-sm">Nuovo nominativo</span>
           </div>
 

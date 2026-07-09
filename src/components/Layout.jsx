@@ -6,7 +6,7 @@ import {
   RiHome5Line, RiHome5Fill,
   RiListUnordered,
   RiQrScanLine,
-  RiTransferLine,
+  RiExchangeLine,
   RiSettings3Line, RiSettings3Fill,
   RiWifiOffLine,
   RiAddLine,
@@ -19,7 +19,7 @@ const navItems = [
   { to: '/elenco', icon: RiListUnordered, label: 'Elenco' },
   { to: '/nuova', icon: RiAddLine, label: 'Nuova' },
   { to: '/scan', icon: RiQrScanLine, label: 'Scan' },
-  { to: '/trasferisci', icon: RiTransferLine, label: 'Trasferisci' },
+  { to: '/trasferisci', icon: RiExchangeLine, label: 'Trasferisci' },
 ];
 
 export default function Layout() {
@@ -33,7 +33,7 @@ export default function Layout() {
   return (
     <div className="flex flex-col min-h-dvh bg-surface">
       {/* Header */}
-      <header className="bg-surface-2 border-b border-surface-4 px-4 py-3 safe-top flex items-center justify-between sticky top-0 z-40">
+      <header className="bg-surface-2 border-b border-surface-4 px-4 py-5 safe-top flex items-center justify-between sticky top-0 z-40">
         <div className="flex items-center gap-3">
           <span className="text-2xl">🎸</span>
           <div>
@@ -88,7 +88,7 @@ export default function Layout() {
               end={to === '/'}
               className={({ isActive }) =>
                 cn(
-                  'flex-1 flex flex-col items-center gap-1 py-3 text-xs transition-colors',
+                  'flex-1 flex flex-col items-center gap-1 py-4 text-xs transition-colors',
                   isActive ? 'text-brand' : 'text-gray-500 hover:text-gray-300'
                 )
               }
