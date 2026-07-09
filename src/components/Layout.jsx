@@ -35,7 +35,7 @@ export default function Layout() {
       {/* Header */}
       <header className="bg-surface-2 border-b border-surface-4 px-4 py-5 safe-top flex items-center justify-between sticky top-0 z-40">
         <div className="flex items-center gap-3">
-          <span className="text-2xl">🎸</span>
+          <img src="/logo.png" alt="Durlo Rocks" className="w-9 h-9 rounded-lg object-cover" />
           <div>
             <h1 className="font-bold text-brand leading-none">Durlo Rocks</h1>
             <div className="flex items-center gap-1 mt-0.5">

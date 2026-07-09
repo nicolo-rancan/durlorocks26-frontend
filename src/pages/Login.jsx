@@ -30,7 +30,7 @@ export default function Login() {
     <div className="min-h-dvh bg-surface flex flex-col items-center justify-center p-6">
       <div className="w-full max-w-sm">
         <div className="text-center mb-10">
-          <div className="text-6xl mb-4">🎸</div>
+          <img src="/logo.png" alt="Durlo Rocks" className="w-24 h-24 rounded-2xl object-cover mx-auto mb-4" />
           <h1 className="text-3xl font-bold text-brand">Durlo Rocks</h1>
           <p className="text-gray-500 mt-2">Gestione prevendite</p>
         </div>
