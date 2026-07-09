@@ -5,15 +5,19 @@ export default {
     extend: {
       colors: {
         brand: {
-          DEFAULT: '#f59e0b',
-          dark: '#d97706',
-          light: '#fbbf24',
+          DEFAULT: '#e040fb',
+          dark: '#b800d8',
+          light: '#f06dff',
+        },
+        accent: {
+          DEFAULT: '#00d4ff',
+          dark: '#00a8cc',
         },
         surface: {
-          DEFAULT: '#111111',
-          2: '#1a1a1a',
-          3: '#242424',
-          4: '#2e2e2e',
+          DEFAULT: '#0a0a0f',
+          2: '#13131e',
+          3: '#1c1c2c',
+          4: '#272740',
         },
       },
       fontFamily: {

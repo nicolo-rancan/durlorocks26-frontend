@@ -4,11 +4,42 @@ import { useOffline } from '@/contexts/OfflineContext';
 import { prevenditeApi } from '@/lib/api';
 import { cachePrevendite, getCachedPrevendite, getLastSyncTime } from '@/lib/offline';
 import { formatDate } from '@/lib/utils';
-import Input from '@/components/ui/Input';
 import Badge from '@/components/ui/Badge';
-import { RiSearchLine, RiRefreshLine, RiWifiOffLine, RiTicket2Line } from 'react-icons/ri';
+import { useToast } from '@/components/ui/Toast';
+import { RiSearchLine, RiRefreshLine, RiWifiOffLine, RiTicket2Line, RiDeleteBinLine } from 'react-icons/ri';
 
-function PrevenditaRow({ p }) {
+function DeleteModal({ prevendita, onConfirm, onCancel, loading }) {
+  return (
+    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+      <div className="bg-surface-2 border border-surface-4 rounded-2xl w-full max-w-sm p-6">
+        <h3 className="text-lg font-bold mb-1">Elimina prevendita?</h3>
+        <p className="text-gray-400 text-sm mb-1">
+          <span className="text-white font-medium">{prevendita.nome} {prevendita.cognome}</span>
+        </p>
+        <p className="font-mono text-xs text-gray-500 mb-5 tracking-widest">{prevendita.codice}</p>
+        <p className="text-red-400 text-xs mb-5">Questa azione non può essere annullata.</p>
+        <div className="flex gap-3">
+          <button
+            onClick={onCancel}
+            disabled={loading}
+            className="flex-1 py-2.5 rounded-xl border border-surface-4 bg-surface-3 text-gray-300 text-sm font-medium hover:bg-surface-4 transition-colors"
+          >
+            Annulla
+          </button>
+          <button
+            onClick={onConfirm}
+            disabled={loading}
+            className="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-medium transition-colors disabled:opacity-50"
+          >
+            {loading ? 'Eliminazione...' : 'Elimina'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PrevenditaRow({ p, onDelete }) {
   return (
     <div className="bg-surface-2 border border-surface-4 rounded-xl p-4 flex items-start justify-between gap-3">
       <div className="flex-1 min-w-0">
@@ -29,6 +60,12 @@ function PrevenditaRow({ p }) {
           <p className="text-xs text-green-600 mt-0.5">Val. {formatDate(p.validata_at)}</p>
         )}
       </div>
+      <button
+        onClick={() => onDelete(p)}
+        className="p-2 text-gray-600 hover:text-red-400 transition-colors shrink-0 mt-0.5"
+      >
+        <RiDeleteBinLine size={18} />
+      </button>
     </div>
   );
 }
@@ -36,13 +73,16 @@ function PrevenditaRow({ p }) {
 export default function Elenco() {
   const { edizione } = useEdition();
   const offline = useOffline();
+  const toast = useToast();
   const [items, setItems] = useState([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [lastSync, setLastSync] = useState(null);
   const [fromCache, setFromCache] = useState(false);
+  const [toDelete, setToDelete] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
-  const load = useCallback(async (query = search) => {
+  const load = useCallback(async (query = '') => {
     setLoading(true);
     if (offline) {
       const cached = await getCachedPrevendite(edizione, query);
@@ -73,6 +113,20 @@ export default function Elenco() {
     return () => clearTimeout(t);
   }, [search]);
 
+  const handleDelete = async () => {
+    setDeleting(true);
+    try {
+      await prevenditeApi.delete(toDelete.id);
+      toast('Prevendita eliminata', 'success');
+      setToDelete(null);
+      load(search);
+    } catch (err) {
+      toast(err.response?.data?.error || 'Errore eliminazione', 'error');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   return (
     <div className="p-4 max-w-lg mx-auto">
       <div className="flex items-center justify-between mb-4">
@@ -81,7 +135,7 @@ export default function Elenco() {
           <div className="flex items-center gap-2 mt-0.5">
             <span className="text-gray-500 text-xs">{items.length} prevendite</span>
             {fromCache && (
-              <span className="flex items-center gap-1 text-xs text-amber-500">
+              <span className="flex items-center gap-1 text-xs text-brand/70">
                 <RiWifiOffLine size={12} /> Cache {lastSync && `· ${lastSync}`}
               </span>
             )}
@@ -122,8 +176,17 @@ export default function Elenco() {
         </div>
       ) : (
         <div className="flex flex-col gap-3">
-          {items.map((p) => <PrevenditaRow key={p.id} p={p} />)}
+          {items.map((p) => <PrevenditaRow key={p.id} p={p} onDelete={setToDelete} />)}
         </div>
+      )}
+
+      {toDelete && (
+        <DeleteModal
+          prevendita={toDelete}
+          onConfirm={handleDelete}
+          onCancel={() => setToDelete(null)}
+          loading={deleting}
+        />
       )}
     </div>
   );

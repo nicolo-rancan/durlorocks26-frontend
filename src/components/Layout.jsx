@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useOffline } from '@/contexts/OfflineContext';
@@ -7,7 +8,7 @@ import {
   RiListUnordered,
   RiQrScanLine,
   RiExchangeLine,
-  RiSettings3Line, RiSettings3Fill,
+  RiSettings3Line,
   RiWifiOffLine,
   RiAddLine,
   RiLogoutBoxLine,
@@ -22,11 +23,37 @@ const navItems = [
   { to: '/trasferisci', icon: RiExchangeLine, label: 'Trasferisci' },
 ];
 
+function LogoutModal({ onConfirm, onCancel }) {
+  return (
+    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+      <div className="bg-surface-2 border border-surface-4 rounded-2xl w-full max-w-sm p-6">
+        <h3 className="text-lg font-bold mb-2">Esci dall'app?</h3>
+        <p className="text-gray-400 text-sm mb-6">Verrai reindirizzato alla pagina di login.</p>
+        <div className="flex gap-3">
+          <button
+            onClick={onCancel}
+            className="flex-1 py-2.5 rounded-xl border border-surface-4 bg-surface-3 text-gray-300 text-sm font-medium hover:bg-surface-4 transition-colors"
+          >
+            Annulla
+          </button>
+          <button
+            onClick={onConfirm}
+            className="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-medium transition-colors"
+          >
+            Esci
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Layout() {
   const { user, logout, isAdmin } = useAuth();
   const offline = useOffline();
   const { edizione, changeEdizione, years } = useEdition();
   const navigate = useNavigate();
+  const [showLogout, setShowLogout] = useState(false);
 
   const handleLogout = () => { logout(); navigate('/login'); };
 
@@ -51,7 +78,7 @@ export default function Layout() {
         </div>
         <div className="flex items-center gap-2">
           {offline && (
-            <span className="flex items-center gap-1 text-xs text-amber-500 bg-amber-500/10 px-2 py-1 rounded-full">
+            <span className="flex items-center gap-1 text-xs text-brand/80 bg-brand/10 px-2 py-1 rounded-full">
               <RiWifiOffLine size={14} /> Offline
             </span>
           )}
@@ -59,13 +86,13 @@ export default function Layout() {
           {isAdmin && (
             <button
               onClick={() => navigate('/impostazioni')}
-              className="p-2 text-gray-400 hover:text-white transition-colors"
+              className="p-2 text-gray-400 hover:text-brand transition-colors"
             >
               <RiSettings3Line size={18} />
             </button>
           )}
           <button
-            onClick={handleLogout}
+            onClick={() => setShowLogout(true)}
             className="p-2 text-gray-400 hover:text-red-400 transition-colors"
           >
             <RiLogoutBoxLine size={18} />
@@ -103,6 +130,13 @@ export default function Layout() {
           ))}
         </div>
       </nav>
+
+      {showLogout && (
+        <LogoutModal
+          onConfirm={handleLogout}
+          onCancel={() => setShowLogout(false)}
+        />
+      )}
     </div>
   );
 }

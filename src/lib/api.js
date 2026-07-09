@@ -36,6 +36,7 @@ export const prevenditeApi = {
   getByCodice: (codice) => api.get(`/prevendite/${codice}`),
   valida: (codice) => api.post(`/prevendite/${codice}/valida`),
   trasferisci: (id, data) => api.put(`/prevendite/${id}/trasferisci`, data),
+  delete: (id) => api.delete(`/prevendite/${id}`),
 };
 
 export const usersApi = {
