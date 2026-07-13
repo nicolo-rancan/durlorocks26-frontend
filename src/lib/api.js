@@ -1,6 +1,8 @@
 import axios from 'axios';
+import { Capacitor } from '@capacitor/core';
 
-const BASE_URL = import.meta.env.VITE_API_URL || '/api';
+const BASE_URL = import.meta.env.VITE_API_URL ||
+  (Capacitor.isNativePlatform() ? 'https://durlorocks.nicolorancan.com/api' : '/api');
 
 const api = axios.create({ baseURL: BASE_URL });
 
