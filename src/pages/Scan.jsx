@@ -6,10 +6,39 @@ import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
 import {
   RiQrScanLine, RiKeyboardLine, RiCheckLine,
-  RiErrorWarningLine, RiRefreshLine, RiUserLine,
+  RiErrorWarningLine, RiRefreshLine, RiUserLine, RiCloseCircleLine,
 } from 'react-icons/ri';
 
-function ResultCard({ result, onReset }) {
+function SvalidaModal({ onConfirm, onCancel, loading }) {
+  return (
+    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+      <div className="bg-surface-2 border border-surface-4 rounded-2xl w-full max-w-sm p-6">
+        <h3 className="text-lg font-bold mb-2">Svalidare la prevendita?</h3>
+        <p className="text-gray-400 text-sm mb-5">
+          La prevendita tornerà allo stato "non validata" e potrà essere eliminata.
+        </p>
+        <div className="flex gap-3">
+          <button
+            onClick={onCancel}
+            disabled={loading}
+            className="flex-1 py-2.5 rounded-xl border border-surface-4 bg-surface-3 text-gray-300 text-sm font-medium hover:bg-surface-4 transition-colors"
+          >
+            Annulla
+          </button>
+          <button
+            onClick={onConfirm}
+            disabled={loading}
+            className="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-medium transition-colors disabled:opacity-50"
+          >
+            {loading ? 'Svalidando...' : 'Svalida'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ResultCard({ result, onReset, onSvalida }) {
   const isAlreadyValidated = result.already_validated;
   const isValid = result.ok;
   const isNotFound = result.not_found;
@@ -70,7 +99,15 @@ function ResultCard({ result, onReset }) {
           </div>
           <p className="font-mono text-xs text-gray-600 mt-3 tracking-widest">{p.codice}</p>
         </div>
-        <Button onClick={onReset}>Scansiona altro</Button>
+        <div className="flex gap-3 w-full max-w-xs">
+          <Button onClick={onReset} className="flex-1">Scansiona altro</Button>
+          <button
+            onClick={() => onSvalida(p.codice)}
+            className="flex-1 py-2.5 rounded-xl border border-red-800 bg-red-950/40 text-red-400 text-sm font-medium hover:bg-red-900/40 transition-colors flex items-center justify-center gap-1.5"
+          >
+            <RiCloseCircleLine size={16} /> Svalida
+          </button>
+        </div>
       </div>
     );
   }
@@ -84,6 +121,8 @@ export default function Scan() {
   const [manualCode, setManualCode] = useState('');
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [svalidaCode, setSvalidaCode] = useState(null);
+  const [svalidaLoading, setSvalidaLoading] = useState(false);
   const scannerRef = useRef(null);
   const scannerInstance = useRef(null);
   const scanning = useRef(false);
@@ -120,6 +159,21 @@ export default function Scan() {
     setResult(null);
     setManualCode('');
     scanning.current = false;
+  };
+
+  const handleSvalida = async () => {
+    setSvalidaLoading(true);
+    try {
+      await prevenditeApi.svalida(svalidaCode);
+      toast('Prevendita svalidata', 'success');
+      setSvalidaCode(null);
+      handleReset();
+    } catch (err) {
+      toast(err.response?.data?.error || 'Errore svalidazione', 'error');
+      setSvalidaCode(null);
+    } finally {
+      setSvalidaLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -160,7 +214,14 @@ export default function Scan() {
   if (result) {
     return (
       <div className="p-4 max-w-lg mx-auto">
-        <ResultCard result={result} onReset={handleReset} />
+        <ResultCard result={result} onReset={handleReset} onSvalida={setSvalidaCode} />
+        {svalidaCode && (
+          <SvalidaModal
+            onConfirm={handleSvalida}
+            onCancel={() => setSvalidaCode(null)}
+            loading={svalidaLoading}
+          />
+        )}
       </div>
     );
   }

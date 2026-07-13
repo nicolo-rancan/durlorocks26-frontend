@@ -55,7 +55,12 @@ function PrevenditaRow({ p, onDelete }) {
           }
         </div>
         <p className="text-gray-500 text-sm truncate mt-0.5">{p.email}</p>
-        <p className="font-mono text-xs text-gray-600 mt-1 tracking-widest">{p.codice}</p>
+        <p className="font-mono text-xs text-gray-600 mt-1 tracking-widest">
+          {p.created_by_username && (
+            <span className="text-gray-500 font-sans not-italic mr-2 tracking-normal">{p.created_by_username}</span>
+          )}
+          {p.codice}
+        </p>
         {p.validata_at && (
           <p className="text-xs text-green-600 mt-0.5">Val. {formatDate(p.validata_at)}</p>
         )}
